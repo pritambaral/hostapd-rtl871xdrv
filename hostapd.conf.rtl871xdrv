@@ -1,0 +1,7 @@
+# include this file from your own hostapd.conf
+
+driver=rtl871xdrv
+ieee80211n=1
+hw_mode=g
+device_name=RTL8192CU
+manufacturer=Realtek
