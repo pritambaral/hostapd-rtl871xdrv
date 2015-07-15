@@ -528,12 +528,6 @@ index e5734bd..80f073d 100644
  
  const struct wpa_driver_ops wpa_driver_wext_ops = {
  	.name = "wext",
-@@ -2335,4 +2393,5 @@ const struct wpa_driver_ops wpa_driver_wext_ops = {
- 	.get_capa = wpa_driver_wext_get_capa,
- 	.set_operstate = wpa_driver_wext_set_operstate,
- 	.get_radio_name = wext_get_radio_name,
-+	.signal_poll = wext_signal_poll,
- };
 diff --git a/src/drivers/drivers.c b/src/drivers/drivers.c
 index d0e42ec..d413c00 100644
 --- a/src/drivers/drivers.c
