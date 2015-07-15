@@ -499,35 +499,6 @@ index e5734bd..80f073d 100644
  	os_memset(&iwr, 0, sizeof(iwr));
  	os_strlcpy(iwr.ifr_name, drv->ifname, IFNAMSIZ);
  
-@@ -2315,6 +2351,28 @@ static const char * wext_get_radio_name(void *priv)
- 	return drv->phyname;
- }
- 
-+//	Aries 20120120,  append rssi information at the end of "status" command
-+int wext_signal_poll(void *priv, struct wpa_signal_info *signal_info)
-+{
-+	struct wpa_driver_wext_data *drv = priv;
-+	struct iwreq iwr;
-+	struct iw_statistics stat;
-+	int ret = 0;
-+
-+	os_memset(&iwr, 0, sizeof(iwr));
-+	os_memset(&stat, 0, sizeof(stat));
-+	os_strlcpy(iwr.ifr_name, drv->ifname, IFNAMSIZ);
-+	iwr.u.data.pointer = (caddr_t) &stat;
-+	iwr.u.data.length = sizeof(struct iw_statistics);
-+	iwr.u.data.flags = 1;
-+	if (ioctl(drv->ioctl_sock, SIOCGIWSTATS, &iwr) < 0) {
-+		perror("ioctl[SIOCGIWSTATS] fail\n");
-+		ret = -1;
-+	}
-+	signal_info->current_signal = stat.qual.level;
-+	signal_info->current_noise = stat.qual.noise;
-+	return ret;
-+}
- 
- const struct wpa_driver_ops wpa_driver_wext_ops = {
- 	.name = "wext",
 diff --git a/src/drivers/drivers.c b/src/drivers/drivers.c
 index d0e42ec..d413c00 100644
 --- a/src/drivers/drivers.c
