@@ -1,8 +1,8 @@
 diff --git a/hostapd/main.c b/hostapd/main.c
-index a9d7da5..2457f95 100644
+index a9d91b9..255a18b 100644
 --- a/hostapd/main.c
 +++ b/hostapd/main.c
-@@ -412,7 +412,7 @@ static int hostapd_global_run(struct hapd_interfaces *ifaces, int daemonize,
+@@ -413,7 +413,7 @@ static int hostapd_global_run(struct hapd_interfaces *ifaces, int daemonize,
  static void show_version(void)
  {
  	fprintf(stderr,
@@ -12,10 +12,10 @@ index a9d7da5..2457f95 100644
  		"IEEE 802.1X/WPA/WPA2/EAP/RADIUS Authenticator\n"
  		"Copyright (c) 2002-2014, Jouni Malinen <j@w1.fi> "
 diff --git a/src/ap/beacon.c b/src/ap/beacon.c
-index 2a4acf2..20d7451 100644
+index 4cae0d9..79c3a60 100644
 --- a/src/ap/beacon.c
 +++ b/src/ap/beacon.c
-@@ -810,6 +810,11 @@ int ieee802_11_build_ap_params(struct hostapd_data *hapd,
+@@ -814,6 +814,11 @@ int ieee802_11_build_ap_params(struct hostapd_data *hapd,
  #ifdef CONFIG_IEEE80211N
  	tailpos = hostapd_eid_ht_capabilities(hapd, tailpos);
  	tailpos = hostapd_eid_ht_operation(hapd, tailpos);
@@ -446,7 +446,7 @@ index ca64d5c..05606f0 100644
  };
 +#endif
 diff --git a/src/drivers/driver_wext.c b/src/drivers/driver_wext.c
-index e5734bd..80f073d 100644
+index 1b3a757..b0c08c7 100644
 --- a/src/drivers/driver_wext.c
 +++ b/src/drivers/driver_wext.c
 @@ -990,6 +990,38 @@ void wpa_driver_wext_scan_timeout(void *eloop_ctx, void *timeout_ctx)
@@ -499,41 +499,6 @@ index e5734bd..80f073d 100644
  	os_memset(&iwr, 0, sizeof(iwr));
  	os_strlcpy(iwr.ifr_name, drv->ifname, IFNAMSIZ);
  
-@@ -2315,6 +2351,28 @@ static const char * wext_get_radio_name(void *priv)
- 	return drv->phyname;
- }
- 
-+//	Aries 20120120,  append rssi information at the end of "status" command
-+int wext_signal_poll(void *priv, struct wpa_signal_info *signal_info)
-+{
-+	struct wpa_driver_wext_data *drv = priv;
-+	struct iwreq iwr;
-+	struct iw_statistics stat;
-+	int ret = 0;
-+
-+	os_memset(&iwr, 0, sizeof(iwr));
-+	os_memset(&stat, 0, sizeof(stat));
-+	os_strlcpy(iwr.ifr_name, drv->ifname, IFNAMSIZ);
-+	iwr.u.data.pointer = (caddr_t) &stat;
-+	iwr.u.data.length = sizeof(struct iw_statistics);
-+	iwr.u.data.flags = 1;
-+	if (ioctl(drv->ioctl_sock, SIOCGIWSTATS, &iwr) < 0) {
-+		perror("ioctl[SIOCGIWSTATS] fail\n");
-+		ret = -1;
-+	}
-+	signal_info->current_signal = stat.qual.level;
-+	signal_info->current_noise = stat.qual.noise;
-+	return ret;
-+}
- 
- const struct wpa_driver_ops wpa_driver_wext_ops = {
- 	.name = "wext",
-@@ -2335,4 +2393,5 @@ const struct wpa_driver_ops wpa_driver_wext_ops = {
- 	.get_capa = wpa_driver_wext_get_capa,
- 	.set_operstate = wpa_driver_wext_set_operstate,
- 	.get_radio_name = wext_get_radio_name,
-+	.signal_poll = wext_signal_poll,
- };
 diff --git a/src/drivers/drivers.c b/src/drivers/drivers.c
 index d0e42ec..d413c00 100644
 --- a/src/drivers/drivers.c
@@ -558,10 +523,10 @@ index d0e42ec..d413c00 100644
  	NULL
  };
 diff --git a/src/drivers/drivers.mak b/src/drivers/drivers.mak
-index 7e175f4..b5881db 100644
+index cdb913e..24015df 100644
 --- a/src/drivers/drivers.mak
 +++ b/src/drivers/drivers.mak
-@@ -58,6 +58,10 @@ DRV_CFLAGS += -DCONFIG_DRIVER_BSD
+@@ -62,6 +62,10 @@ DRV_CFLAGS += -DCONFIG_DRIVER_BSD
  DRV_OBJS += ../src/drivers/driver_bsd.o
  CONFIG_L2_FREEBSD=y
  CONFIG_DNET_PCAP=y
@@ -572,7 +537,7 @@ index 7e175f4..b5881db 100644
  endif
  
  ifdef CONFIG_DRIVER_OPENBSD
-@@ -74,6 +78,17 @@ DRV_OBJS += ../src/drivers/driver_test.o
+@@ -78,6 +82,17 @@ DRV_OBJS += ../src/drivers/driver_test.o
  NEED_AP_MLME=y
  endif
  
@@ -609,10 +574,10 @@ index 23e9823..173e71d 100644
  	return r;
  }
 diff --git a/src/wps/wps.c b/src/wps/wps.c
-index 648cfd1..0a74d0c 100644
+index b0f6887..11f095c 100644
 --- a/src/wps/wps.c
 +++ b/src/wps/wps.c
-@@ -320,11 +320,15 @@ int wps_is_addr_authorized(const struct wpabuf *msg, const u8 *addr,
+@@ -321,11 +321,15 @@ int wps_is_addr_authorized(const struct wpabuf *msg, const u8 *addr,
  	if (wps_parse_msg(msg, &attr) < 0)
  		return 0;
  
@@ -629,7 +594,7 @@ index 648cfd1..0a74d0c 100644
  		return is_selected_pin_registrar(&attr);
  	}
  
-@@ -341,6 +345,7 @@ int wps_is_addr_authorized(const struct wpabuf *msg, const u8 *addr,
+@@ -342,6 +346,7 @@ int wps_is_addr_authorized(const struct wpabuf *msg, const u8 *addr,
  	}
  
  	return 0;
@@ -638,7 +603,7 @@ index 648cfd1..0a74d0c 100644
  
  
 diff --git a/src/wps/wps_registrar.c b/src/wps/wps_registrar.c
-index b917e6b..4738fd5 100644
+index b90cc25..e41f5f8 100644
 --- a/src/wps/wps_registrar.c
 +++ b/src/wps/wps_registrar.c
 @@ -589,9 +589,10 @@ static int wps_build_probe_config_methods(struct wps_registrar *reg,
