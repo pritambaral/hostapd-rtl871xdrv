@@ -14,7 +14,7 @@ Realtek's code dump contained a kernel driver and a special driver for hostapd. 
 
 The hostapd driver however, wasn't provided as a driver. A modified hostapd, somewhere in its 0.8.x version, was dumped. If you wanted a newer hostapd, well, too bad.
 
-This repo has the extracted modifications to mainline hostapd done by Realtek, adapted for hostapd 2.2. It is very likely that these would work with hostapd 2.x.
+This repo has the extracted modifications to mainline hostapd done by Realtek, adapted for hostapd 2.2. For other versions of hostapd, checkout to the corresponding tag.
 
 ## Installation
 ----
