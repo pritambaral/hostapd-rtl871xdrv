@@ -1376,7 +1376,6 @@ static int rtl871x_set_beacon_ops(void *priv, struct wpa_driver_ap_params *param
 	struct rtl871x_driver_data *drv = priv;
 	struct hostapd_data *hapd = drv->hapd;
 
-	u8 *ssid_ie;
 	u8 ssid_len;
 	u8 expend_len = 0;
 	
@@ -1389,8 +1388,8 @@ static int rtl871x_set_beacon_ops(void *priv, struct wpa_driver_ap_params *param
 #ifdef RTL871X_HIDDEN_SSID_SUPPORT
 	rtl871x_set_hidden_ssid_ops(drv->iface, priv, hapd->conf->ignore_broadcast_ssid);
 
-	ssid_ie = get_ie((params->head+24+12), (params->head_len-24-12), WLAN_EID_SSID);
 	
+	const u8 *ssid_ie = get_ie((params->head+24+12), (params->head_len-24-12), WLAN_EID_SSID);
 	if(hapd->conf->ignore_broadcast_ssid == 2)
 	{
 		ssid_len = ssid_ie[1];
@@ -1398,17 +1397,17 @@ static int rtl871x_set_beacon_ops(void *priv, struct wpa_driver_ap_params *param
 		//confirm the ssid_len
 		if(ssid_len != hapd->conf->ssid.ssid_len) 
 		{
-			printf("%s ssid_len(%u) != hapd->conf->ssid.ssid_len(%u)!!\n", __func__
+			printf("%s ssid_len(%u) != hapd->conf->ssid.ssid_len(%lu)!!\n", __func__
 				, ssid_len, hapd->conf->ssid.ssid_len
 			);
 		}
 
-		memcpy(ssid_ie+2, hapd->conf->ssid.ssid, ssid_len);
+		memcpy( (void *)ssid_ie+2, hapd->conf->ssid.ssid, ssid_len);
 	}
 	else if(hapd->conf->ignore_broadcast_ssid == 1)
 	{
 		expend_len = hapd->conf->ssid.ssid_len;
-		printf("%s ignore_broadcast_ssid:%d, %s,%d, expend_len:%u\n", __func__
+		printf("%s ignore_broadcast_ssid:%d, %s,%lu, expend_len:%u\n", __func__
 			, hapd->conf->ignore_broadcast_ssid
 			, hapd->conf->ssid.ssid
 			, hapd->conf->ssid.ssid_len
