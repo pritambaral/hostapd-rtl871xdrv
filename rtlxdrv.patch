@@ -1,8 +1,8 @@
 diff --git a/hostapd/main.c b/hostapd/main.c
-index dd389a8..901236d 100644
+index 6c7406a..07dda78 100644
 --- a/hostapd/main.c
 +++ b/hostapd/main.c
-@@ -421,7 +421,7 @@ static int hostapd_global_run(struct hapd_interfaces *ifaces, int daemonize,
+@@ -422,7 +422,7 @@ static int hostapd_global_run(struct hapd_interfaces *ifaces, int daemonize,
  static void show_version(void)
  {
  	fprintf(stderr,
@@ -12,10 +12,10 @@ index dd389a8..901236d 100644
  		"IEEE 802.1X/WPA/WPA2/EAP/RADIUS Authenticator\n"
  		"Copyright (c) 2002-2015, Jouni Malinen <j@w1.fi> "
 diff --git a/src/ap/beacon.c b/src/ap/beacon.c
-index e575b65..6167369 100644
+index 5fe8fd5..5f7c077 100644
 --- a/src/ap/beacon.c
 +++ b/src/ap/beacon.c
-@@ -887,6 +887,11 @@ int ieee802_11_build_ap_params(struct hostapd_data *hapd,
+@@ -1007,6 +1007,11 @@ int ieee802_11_build_ap_params(struct hostapd_data *hapd,
  #ifdef CONFIG_IEEE80211N
  	tailpos = hostapd_eid_ht_capabilities(hapd, tailpos);
  	tailpos = hostapd_eid_ht_operation(hapd, tailpos);
@@ -28,10 +28,10 @@ index e575b65..6167369 100644
  
  	tailpos = hostapd_eid_ext_capab(hapd, tailpos);
 diff --git a/src/ap/hw_features.c b/src/ap/hw_features.c
-index 05431d3..0984e84 100644
+index fc8786d..efd3841 100644
 --- a/src/ap/hw_features.c
 +++ b/src/ap/hw_features.c
-@@ -483,7 +483,10 @@ static int ieee80211n_check_40mhz(struct hostapd_iface *iface)
+@@ -494,7 +494,10 @@ static int ieee80211n_check_40mhz(struct hostapd_iface *iface)
  		iface->num_ht40_scan_tries = 1;
  		eloop_cancel_timeout(ap_ht40_scan_retry, iface, NULL);
  		eloop_register_timeout(1, 0, ap_ht40_scan_retry, iface, NULL);
@@ -44,7 +44,7 @@ index 05431d3..0984e84 100644
  
  	if (ret < 0) {
 diff --git a/src/drivers/driver_bsd.c b/src/drivers/driver_bsd.c
-index 0f1a0f6..56518af 100644
+index bab1f03..555d0d8 100644
 --- a/src/drivers/driver_bsd.c
 +++ b/src/drivers/driver_bsd.c
 @@ -47,6 +47,12 @@
@@ -2565,10 +2565,10 @@ index 0000000..cbee5d2
 +};
 +
 diff --git a/src/drivers/driver_wext.c b/src/drivers/driver_wext.c
-index a1581b8..0eb4765 100644
+index 01defdf..1091108 100644
 --- a/src/drivers/driver_wext.c
 +++ b/src/drivers/driver_wext.c
-@@ -994,6 +994,38 @@ void wpa_driver_wext_scan_timeout(void *eloop_ctx, void *timeout_ctx)
+@@ -1081,6 +1081,38 @@ void wpa_driver_wext_scan_timeout(void *eloop_ctx, void *timeout_ctx)
  	wpa_supplicant_event(timeout_ctx, EVENT_SCAN_RESULTS, NULL);
  }
  
@@ -2607,7 +2607,7 @@ index a1581b8..0eb4765 100644
  
  /**
   * wpa_driver_wext_scan - Request the driver to initiate scan
-@@ -1016,6 +1048,10 @@ int wpa_driver_wext_scan(void *priv, struct wpa_driver_scan_params *params)
+@@ -1103,6 +1135,10 @@ int wpa_driver_wext_scan(void *priv, struct wpa_driver_scan_params *params)
  		return -1;
  	}
  
@@ -2619,7 +2619,7 @@ index a1581b8..0eb4765 100644
  	os_strlcpy(iwr.ifr_name, drv->ifname, IFNAMSIZ);
  
 diff --git a/src/drivers/drivers.c b/src/drivers/drivers.c
-index f0c3bb3..e5d04a7 100644
+index a98af9a..d7d9c5b 100644
 --- a/src/drivers/drivers.c
 +++ b/src/drivers/drivers.c
 @@ -45,6 +45,9 @@ extern struct wpa_driver_ops wpa_driver_atheros_ops; /* driver_atheros.c */
@@ -2631,8 +2631,8 @@ index f0c3bb3..e5d04a7 100644
 +#endif /* CONFIG_DRIVER_RTW */
  
  
- struct wpa_driver_ops *wpa_drivers[] =
-@@ -82,5 +85,8 @@ struct wpa_driver_ops *wpa_drivers[] =
+ const struct wpa_driver_ops *const wpa_drivers[] =
+@@ -82,5 +85,8 @@ const struct wpa_driver_ops *const wpa_drivers[] =
  #ifdef CONFIG_DRIVER_NONE
  	&wpa_driver_none_ops,
  #endif /* CONFIG_DRIVER_NONE */
@@ -2642,10 +2642,10 @@ index f0c3bb3..e5d04a7 100644
  	NULL
  };
 diff --git a/src/drivers/drivers.mak b/src/drivers/drivers.mak
-index 9434078..b9a7b38 100644
+index 3dd43c7..3e44fcb 100644
 --- a/src/drivers/drivers.mak
 +++ b/src/drivers/drivers.mak
-@@ -72,6 +72,10 @@ DRV_CFLAGS += -DCONFIG_DRIVER_BSD
+@@ -74,6 +74,10 @@ DRV_CFLAGS += -DCONFIG_DRIVER_BSD
  DRV_OBJS += ../src/drivers/driver_bsd.o
  CONFIG_L2_FREEBSD=y
  CONFIG_DNET_PCAP=y
@@ -2656,7 +2656,7 @@ index 9434078..b9a7b38 100644
  endif
  
  ifdef CONFIG_DRIVER_OPENBSD
-@@ -82,6 +86,17 @@ DRV_CFLAGS += -DCONFIG_DRIVER_OPENBSD
+@@ -84,6 +88,17 @@ DRV_CFLAGS += -DCONFIG_DRIVER_OPENBSD
  DRV_OBJS += ../src/drivers/driver_openbsd.o
  endif
  
@@ -2675,10 +2675,10 @@ index 9434078..b9a7b38 100644
  DRV_CFLAGS += -DCONFIG_DRIVER_NONE
  DRV_OBJS += ../src/drivers/driver_none.o
 diff --git a/src/eap_peer/eap_wsc.c b/src/eap_peer/eap_wsc.c
-index 7ce0a53..e0edb24 100644
+index 7ac99c7..1f7697c 100644
 --- a/src/eap_peer/eap_wsc.c
 +++ b/src/eap_peer/eap_wsc.c
-@@ -566,8 +566,13 @@ send_msg:
+@@ -569,8 +569,13 @@ send_msg:
  	r = eap_wsc_build_msg(data, ret, id);
  	if (data->state == FAIL && ret->methodState == METHOD_DONE) {
  		/* Use reduced client timeout for WPS to avoid long wait */
@@ -2693,7 +2693,7 @@ index 7ce0a53..e0edb24 100644
  	return r;
  }
 diff --git a/src/wps/wps.c b/src/wps/wps.c
-index 2c68be8..7f44509 100644
+index fbaf85a..10a82e1 100644
 --- a/src/wps/wps.c
 +++ b/src/wps/wps.c
 @@ -321,11 +321,15 @@ int wps_is_addr_authorized(const struct wpabuf *msg, const u8 *addr,
@@ -2722,7 +2722,7 @@ index 2c68be8..7f44509 100644
  
  
 diff --git a/src/wps/wps_registrar.c b/src/wps/wps_registrar.c
-index 48b7e12..ffc857a 100644
+index 4ca3a42..f74b036 100644
 --- a/src/wps/wps_registrar.c
 +++ b/src/wps/wps_registrar.c
 @@ -589,9 +589,10 @@ static int wps_build_probe_config_methods(struct wps_registrar *reg,
