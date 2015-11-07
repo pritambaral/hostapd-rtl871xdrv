@@ -33,7 +33,7 @@ $ cd hostapd
 $ cp defconfig .config
 $ echo CONFIG_DRIVER_RTW=y >> .config
 ```
-Credits: [oblique](github.com/pritambaral/hostapd-rtl871xdrv/pull/3#issuecomment-76276806)
+Credits: [oblique](https://github.com/pritambaral/hostapd-rtl871xdrv/pull/3#issuecomment-76276806)
 
 Now you're all set to compile. Use your distro's build system, if set up, to compile and package and everything.
 
