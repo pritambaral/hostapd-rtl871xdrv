@@ -43,6 +43,10 @@ If `make` succeeds, you'll have two binaries in the same directory: `hostapd` an
 
 A simple `hostapd.conf` file has been provided.
 
+## Why only hostapd, no wpa_supplicant?
+
+At the time of releasing this, the mainline driver worked well enough for STA mode operation. The kernel driver from Realtek was only needed for AP mode.
+
 ## LICENSE
 ----
 No code here has been written by me, only existing code from Realtek has been modified. As per the original license:
