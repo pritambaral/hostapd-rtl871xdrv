@@ -19,7 +19,7 @@ This repo has the extracted modifications to mainline hostapd done by Realtek, a
 ## Installation
 ----
 
-Get a fresh copy of hostapd source from your distro or from http://hostap.epitest.fi/hostapd/; I suggest the former, but if you have reason to use the latter, go ahead.
+Get a fresh copy of hostapd source from your distro or from http://w1.fi/hostapd/; I suggest the former, but if you have reason to use the latter, go ahead.
 
 **Make sure you can build hostapd before proceeding.**
 
