@@ -14,7 +14,7 @@ Realtek's code dump contained a kernel driver and a special driver for hostapd. 
 
 The hostapd driver however, wasn't provided as a driver. A modified hostapd, somewhere in its 0.8.x version, was dumped. If you wanted a newer hostapd, well, too bad.
 
-This repo has the extracted modifications to mainline hostapd done by Realtek, adapted for hostapd 2.5. For other versions of hostapd, checkout to the corresponding tag.
+This repo has the extracted modifications to mainline hostapd done by Realtek, adapted for hostapd 2.6. For other versions of hostapd, checkout to the corresponding tag.
 
 ## Installation
 ----
@@ -25,7 +25,7 @@ Get a fresh copy of hostapd source from your distro or from http://w1.fi/hostapd
 
 Inside the directory that contains `hostapd`, `src`, `wpa_supplicant`, apply the patch:
 ```
-$ patch -Np1 -i </path/to/rtl871xdrv.patch>
+$ patch -Np1 -i </path/to/rtlxdrv.patch>
 ```
 
 Make sure you enable the driver in `.config`.
@@ -35,7 +35,7 @@ $ echo CONFIG_DRIVER_RTW=y >> .config
 
 Credits: [oblique](https://github.com/pritambaral/hostapd-rtl871xdrv/pull/3#issuecomment-76276806)
 
-*(If you don't know what `.config` is, then you haven't build vanilla hostapd yet. You should have been able to do it before applying the patch.)*
+*(If you don't know what `.config` is, then you haven't built vanilla hostapd yet. You should have been able to do it before applying the patch.)*
 
 Now you're all set. Rebuild hostapd and use.
 
@@ -47,7 +47,7 @@ At the time of releasing this, the mainline driver worked well enough for STA mo
 
 ## LICENSE
 ----
-No code here has been written by me, only existing code from Realtek has been modified. As per the original license:
+Little code here has been written by me, most of the code comes from Realtek's source dump. As per the original license:
 
 ```
 This program is free software; you can redistribute it and/or modify
