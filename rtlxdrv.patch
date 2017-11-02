@@ -580,10 +580,10 @@ index 0000000..c5ee335
 +
 diff --git a/src/drivers/driver_rtw.c b/src/drivers/driver_rtw.c
 new file mode 100644
-index 0000000..c10b9cc
+index 0000000..d0f549e
 --- /dev/null
 +++ b/src/drivers/driver_rtw.c
-@@ -0,0 +1,1971 @@
+@@ -0,0 +1,1988 @@
 +/*
 + * hostapd / Driver interface for rtl871x driver
 + * Copyright (c) 2010,
@@ -694,6 +694,8 @@ index 0000000..c10b9cc
 +
 +	struct hostap_sta_driver_data acct_data;
 +
++	char brname[IFNAMSIZ];
++	unsigned int added_if_into_bridge:1;
 +};
 +
 +/*
@@ -2332,7 +2334,6 @@ index 0000000..c10b9cc
 +	struct ifreq ifr;
 +	//struct iwreq iwr;
 +	char	ifrn_name[IFNAMSIZ + 1];//for mgnt_l2_sock/mgnt_sock
-+	char brname[IFNAMSIZ];
 +
 +	drv = os_zalloc(sizeof(struct rtl871x_driver_data));
 +	if (drv == NULL) {
@@ -2370,9 +2371,21 @@ index 0000000..c10b9cc
 +
 +
 +	if (params->bridge[0]) {
++
++		os_memcpy(drv->brname, params->bridge[0], sizeof(drv->brname));
++
++		// Add the iface to bridge if it isn't yet
++		if (linux_br_get(drv->brname, drv->iface) < 0) {
++			if (linux_br_add_if(drv->ioctl_sock, drv->brname, drv->iface) < 0) {
++				wpa_printf(MSG_ERROR, "Failed to add interface %s into bridge %s: %s", drv->iface, drv->brname, strerror(errno));
++			} else {
++				drv->added_if_into_bridge = 1;
++			}
++		}
++
 +		wpa_printf(MSG_DEBUG, "Configure bridge %s for EAPOL traffic.",
-+			   params->bridge[0]);
-+		drv->l2_sock_recv = l2_packet_init(params->bridge[0], NULL,
++			   drv->brname);
++		drv->l2_sock_recv = l2_packet_init(drv->brname, NULL,
 +						ETH_P_EAPOL, rtl871x_handle_read, drv,
 +						1);
 +		if (drv->l2_sock_recv == NULL)
@@ -2382,10 +2395,10 @@ index 0000000..c10b9cc
 +			printf("no br0 interface , let l2_sock_recv==l2_sock_xmit=0x%p\n", drv->l2_sock);
 +		}
 +
-+	} else if (linux_br_get(brname, drv->iface) == 0) {
++	} else if (linux_br_get(drv->brname, drv->iface) == 0) {
 +		wpa_printf(MSG_DEBUG, "Interface in bridge %s; configure for "
-+			   "EAPOL receive", brname);
-+		drv->l2_sock_recv = l2_packet_init(brname, NULL, ETH_P_EAPOL,
++			   "EAPOL receive", drv->brname);
++		drv->l2_sock_recv = l2_packet_init(drv->brname, NULL, ETH_P_EAPOL,
 +						rtl871x_handle_read, drv, 1);
 +		if (drv->l2_sock_recv == NULL)
 +			goto bad;
@@ -2499,6 +2512,10 @@ index 0000000..c10b9cc
 +		perror("ioctl[SIOCSIWMODE]");
 +	}
 +*/
++	if (drv->added_if_into_bridge && linux_br_del_if(drv->ioctl_sock, drv->brname, drv->iface) < 0) {
++		wpa_printf(MSG_INFO, "Failed to remove interface %s from bridge %s: %s", drv->iface, drv->brname, strerror(errno));
++	}
++
 +	rtl871x_set_mode(drv, IW_MODE_INFRA);
 +
 +
